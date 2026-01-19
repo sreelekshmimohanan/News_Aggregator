@@ -37,6 +37,33 @@
                 <input type="password" class="form-control" name="password" id="password" required data-validation-required-message="Please enter your Password.">
               </div>
             </div>
+            <div class="control-group form-group">
+              <div class="controls">
+                <label>Role:</label>
+                <select class="form-control" name="role" id="role" required>
+                  <option value="user">User</option>
+                  <option value="reporter">Reporter</option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group form-group reporter-fields" style="display: none;">
+              <div class="controls">
+                <label>Experience Years:</label>
+                <input type="number" class="form-control" name="experience_years" id="experience_years">
+              </div>
+            </div>
+            <div class="control-group form-group reporter-fields" style="display: none;">
+              <div class="controls">
+                <label>Specialization:</label>
+                <input type="text" class="form-control" name="specialization" id="specialization">
+              </div>
+            </div>
+            <div class="control-group form-group reporter-fields" style="display: none;">
+              <div class="controls">
+                <label>Bio:</label>
+                <textarea class="form-control" name="bio" id="bio" rows="3"></textarea>
+              </div>
+            </div>
             <div id="success"></div>
             <!-- For success/fail messages -->
             <button type="submit" class="btn btn-primary" id="sendMessageButton">Submit</button>
@@ -48,6 +75,21 @@
 
     </div>
     <!-- /.container -->
+
+<script>
+document.getElementById('role').addEventListener('change', function() {
+    var reporterFields = document.querySelectorAll('.reporter-fields');
+    if (this.value === 'reporter') {
+        reporterFields.forEach(function(field) {
+            field.style.display = 'block';
+        });
+    } else {
+        reporterFields.forEach(function(field) {
+            field.style.display = 'none';
+        });
+    }
+});
+</script>
 
 
 

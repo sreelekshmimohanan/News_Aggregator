@@ -1,0 +1,300 @@
+{% load static %}
+
+{% block content %}
+{% include 'header.html' %}
+
+<div class="container-fluid" style="margin-top: 100px; padding: 20px;">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-cog mr-2 text-primary"></i>Manage Articles
+                    </h1>
+                    <p class="text-muted mb-0">Admin panel for managing news articles</p>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge badge-primary badge-pill">
+                        <i class="fas fa-file-alt mr-1"></i>{{ articles|length }} Total Articles
+                    </span>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Total Articles</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles|length }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Active Reporters</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles|length|add:"0" }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Categories</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">5</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-tags fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        This Month</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles|length }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles Table -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-table mr-2"></i>All Articles
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Category</th>
+                                    <th>Published Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for article in articles %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <h6 class="mb-0 font-weight-bold">{{ article.title|truncatechars:50 }}</h6>
+                                                <small class="text-muted">{{ article.content|truncatechars:100 }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary text-white mr-2" style="width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">
+                                                {{ article.author.name|first|upper }}
+                                            </div>
+                                            {{ article.author.name }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{% if article.category == 'politics' %}danger{% elif article.category == 'sports' %}success{% elif article.category == 'technology' %}info{% elif article.category == 'business' %}warning{% else %}secondary{% endif %}">
+                                            {{ article.category|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ article.published_date|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-info" onclick="viewArticle({{ article.id }})" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning" onclick="editArticle({{ article.id }})" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteArticle({{ article.id }}, '{{ article.title|escapejs }}')" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No articles found</h5>
+                                        <p class="text-muted">There are no articles to manage at the moment.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the article "<strong id="deleteArticleTitle"></strong>"?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="article_id" id="deleteArticleId">
+                    <input type="hidden" name="delete_article" value="1">
+                    <button type="submit" class="btn btn-danger">Delete Article</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #5a5c69;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.avatar-circle {
+    font-size: 14px;
+}
+
+.btn-group .btn {
+    margin-right: 5px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+.card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.text-primary {
+    color: #5a5c69 !important;
+}
+
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.shadow {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+</style>
+
+<script>
+function viewArticle(articleId) {
+    // Redirect to view news with article anchor
+    window.location.href = "{% url 'view_news' %}#article-" + articleId;
+}
+
+function editArticle(articleId) {
+    // Placeholder for edit functionality
+    alert('Edit functionality will be implemented soon. Article ID: ' + articleId);
+}
+
+function deleteArticle(articleId, articleTitle) {
+    document.getElementById('deleteArticleId').value = articleId;
+    document.getElementById('deleteArticleTitle').textContent = articleTitle;
+    $('#deleteModal').modal('show');
+}
+
+// Add some interactive enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to table rows
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f8f9fa';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+
+    // Add loading state to delete button
+    const deleteForm = document.querySelector('#deleteModal form');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
+            submitBtn.disabled = true;
+        });
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% load static %}
+
+{% block content %}
+{% include 'header.html' %}
+
+ <!-- Contact Form -->
+      <!-- In order to set the email address and subject line for the contact form go to the bin/contact_me.php file. -->
+      
+      <div class="row">
+        
+        <div class="col-lg-5 mb-4 contact-left" style="margin-left: 500px;">
+          <h3>Add News Article</h3>
+          <form name="sentMessage" id="contactForm" method="post" novalidate>
+            {% csrf_token %}
+            <div class="control-group form-group">
+              <div class="controls">
+                <label> Title:</label>
+             <input type="text" class="form-control" name="title" id="title" required data-validation-required-message="Please enter the title.">
+                <p class="help-block"></p>
+              </div>
+            </div>
+            <div class="control-group form-group">
+              <div class="controls">
+                <label>Content:</label>
+                <textarea class="form-control" name="content" id="content" rows="5" required data-validation-required-message="Please enter the content."></textarea>
+              </div>
+            </div>
+            <div class="control-group form-group">
+              <div class="controls">
+                <label>Category:</label>
+                <select class="form-control" name="category" id="category" required>
+                  <option value="">Select Category</option>
+                  <option value="politics">Politics</option>
+                  <option value="sports">Sports</option>
+                  <option value="technology">Technology</option>
+                  <option value="business">Business</option>
+                  <option value="entertainment">Entertainment</option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group form-group">
+              <div class="controls">
+                <label>Tags:</label>
+                <input type="text" class="form-control" name="tags" id="tags">
+              </div>
+            </div>
+            <div id="success"></div>
+            <!-- For success/fail messages -->
+            <button type="submit" class="btn btn-primary" id="sendMessageButton">Submit</button>
+          </form>
+        </div>
+
+      </div>
+      <!-- /.row -->
+
+    </div>
+    <!-- /.container -->
+
+{% endblock %}

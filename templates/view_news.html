@@ -1,0 +1,465 @@
+{% load static %}
+
+{% block content %}
+{% include 'header.html' %}
+
+<div class="dashboard-container" style="margin-top: 80px; background-color: #f8f9fc; min-height: calc(100vh - 80px);">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-xl-3 col-lg-4 col-md-12 mb-4">
+                <div class="sidebar-sticky">
+                    <!-- Quick Stats -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="m-0 font-weight-bold">
+                                <i class="fas fa-chart-line mr-2"></i>Dashboard Overview
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4 mb-0 font-weight-bold text-primary">{{ articles|length }}</div>
+                                    <div class="small text-muted">Total Articles</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 mb-0 font-weight-bold text-success">{{ articles|length|add:"0" }}</div>
+                                    <div class="small text-muted">This Week</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-filter mr-2"></i>Filter by Category
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="category-filter">
+                                <a href="{% url 'view_news' %}" class="btn btn-outline-secondary btn-sm btn-block mb-2 {% if not request.GET.category %}active{% endif %}">
+                                    <i class="fas fa-globe mr-1"></i>All Categories
+                                </a>
+                                <a href="?category=politics" class="btn btn-outline-danger btn-sm btn-block mb-2 {% if request.GET.category == 'politics' %}active{% endif %}">
+                                    <i class="fas fa-landmark mr-1"></i>Politics
+                                </a>
+                                <a href="?category=sports" class="btn btn-outline-success btn-sm btn-block mb-2 {% if request.GET.category == 'sports' %}active{% endif %}">
+                                    <i class="fas fa-trophy mr-1"></i>Sports
+                                </a>
+                                <a href="?category=technology" class="btn btn-outline-info btn-sm btn-block mb-2 {% if request.GET.category == 'technology' %}active{% endif %}">
+                                    <i class="fas fa-microchip mr-1"></i>Technology
+                                </a>
+                                <a href="?category=business" class="btn btn-outline-warning btn-sm btn-block mb-2 {% if request.GET.category == 'business' %}active{% endif %}">
+                                    <i class="fas fa-briefcase mr-1"></i>Business
+                                </a>
+                                <a href="?category=entertainment" class="btn btn-outline-dark btn-sm btn-block mb-2 {% if request.GET.category == 'entertainment' %}active{% endif %}">
+                                    <i class="fas fa-film mr-1"></i>Entertainment
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Articles -->
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-clock mr-2"></i>Recent Articles
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            {% for article in articles|slice:":5" %}
+                            <div class="p-3 border-bottom">
+                                <h6 class="font-weight-bold mb-1">
+                                    <a href="#article-{{ article.id }}" class="text-decoration-none text-dark">{{ article.title|truncatechars:40 }}</a>
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-user mr-1"></i>{{ article.author.name }} • {{ article.published_date|timesince }}
+                                </small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-xl-9 col-lg-8 col-md-12">
+                <!-- Header Section -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">
+                            <i class="fas fa-newspaper mr-2 text-primary"></i>News Dashboard
+                        </h1>
+                        <p class="text-muted mb-0">Stay updated with the latest news articles</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="badge badge-primary badge-pill mr-3">
+                            <i class="fas fa-file-alt mr-1"></i>{{ articles|length }} Article{{ articles|length|pluralize }}
+                        </span>
+                        {% if request.GET.category %}
+                        <span class="badge badge-secondary badge-pill">
+                            <i class="fas fa-tag mr-1"></i>{{ request.GET.category|title }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Search Section -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <form method="GET" class="d-flex flex-column flex-md-row">
+                            <div class="input-group flex-grow-1 mb-3 mb-md-0">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                </div>
+                                <input type="text" name="q" class="form-control border-0 bg-light" placeholder="Search articles by title..." value="{{ query }}" style="font-size: 14px;">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search mr-1"></i>Search
+                                    </button>
+                                </div>
+                            </div>
+                            {% if query or request.GET.category %}
+                            <div class="ml-md-2">
+                                <a href="{% url 'view_news' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times mr-1"></i>Clear Filters
+                                </a>
+                            </div>
+                            {% endif %}
+                        </form>
+                        {% if query %}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Found {{ articles|length }} result{{ articles|length|pluralize }} for "<strong>{{ query }}</strong>"
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+    
+                <!-- Articles Grid -->
+                <div class="row">
+                    {% for article in articles %}
+                    <div class="col-xl-6 col-lg-6 col-md-12 mb-4" id="article-{{ article.id }}">
+                        <div class="card h-100 shadow-sm article-card border-left-{% if article.category == 'politics' %}danger{% elif article.category == 'sports' %}success{% elif article.category == 'technology' %}info{% elif article.category == 'business' %}warning{% else %}primary{% endif %}">
+                            <div class="card-header bg-white border-bottom-0 pb-0">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-2 text-primary font-weight-bold" style="line-height: 1.3;">
+                                            {{ article.title }}
+                                        </h5>
+                                        {% if article.category %}
+                                        <span class="badge badge-{% if article.category == 'politics' %}danger{% elif article.category == 'sports' %}success{% elif article.category == 'technology' %}info{% elif article.category == 'business' %}warning{% else %}secondary{% endif %} badge-pill mb-2">
+                                            <i class="fas fa-tag mr-1"></i>{{ article.category|title }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ml-2">
+                                        <div class="dropdown">
+                                            <button class="btn btn-link text-muted p-0" type="button" data-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                <a class="dropdown-item" href="#" onclick="shareArticle('{{ article.title }}', window.location.href + '#article-{{ article.id }}')">
+                                                    <i class="fas fa-share mr-2"></i>Share
+                                                </a>
+                                                <a class="dropdown-item" href="#" onclick="bookmarkArticle({{ article.id }})">
+                                                    <i class="fas fa-bookmark mr-2"></i>Bookmark
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                <div class="small text-muted mb-3 d-flex align-items-center">
+                                    <i class="fas fa-user-circle mr-1 text-primary"></i>
+                                    <span class="mr-3">{{ article.author.name }}</span>
+                                    <i class="fas fa-calendar-alt mr-1 text-info"></i>
+                                    <span class="mr-3">{{ article.published_date|date:"M d, Y" }}</span>
+                                    <i class="fas fa-clock mr-1 text-warning"></i>
+                                    <span>{{ article.published_date|timesince }}</span>
+                                </div>
+
+                                <div class="article-content mb-3">
+                                    <p class="card-text text-dark" style="line-height: 1.6; font-size: 14px;">
+                                        {{ article.content|truncatechars:250 }}
+                                    </p>
+                                    {% if article.content|length > 250 %}
+                                    <button class="btn btn-link p-0 text-primary btn-sm read-more-btn" data-article-id="{{ article.id }}">
+                                        <i class="fas fa-chevron-down mr-1"></i>Read More
+                                    </button>
+                                    {% endif %}
+                                </div>
+
+                                {% if article.summary %}
+                                <div class="summary-section mb-3">
+                                    <button class="btn btn-outline-info btn-sm toggle-summary" data-article-id="{{ article.id }}">
+                                        <i class="fas fa-eye mr-1"></i>View AI Summary
+                                    </button>
+                                    <div class="summary-content mt-2" id="summary-{{ article.id }}" style="display: none;">
+                                        <div class="alert alert-light border border-info">
+                                            <div class="d-flex align-items-start">
+                                                <i class="fas fa-robot text-info mr-2 mt-1"></i>
+                                                <div>
+                                                    <strong class="text-info">AI Summary:</strong>
+                                                    <p class="mb-0 mt-1">{{ article.summary }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% if article.tag_list %}
+                                <div class="mb-3">
+                                    <small class="text-muted d-flex align-items-center flex-wrap">
+                                        <i class="fas fa-tags mr-2"></i>
+                                        {% for tag in article.tag_list %}
+                                        <span class="badge badge-light mr-1 mb-1 px-2 py-1" style="font-size: 11px;">{{ tag }}</span>
+                                        {% endfor %}
+                                    </small>
+                                </div>
+                                {% endif %}
+
+                                <div class="card-actions d-flex justify-content-between align-items-center">
+                                    <div class="article-stats small text-muted">
+                                        <i class="fas fa-eye mr-1"></i>1.2k views
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-outline-primary btn-sm mr-1" onclick="likeArticle({{ article.id }})">
+                                            <i class="fas fa-heart mr-1"></i>Like
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="shareArticle('{{ article.title }}', window.location.href + '#article-{{ article.id }}')">
+                                            <i class="fas fa-share mr-1"></i>Share
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body text-center py-5">
+                                <div class="empty-state">
+                                    <i class="fas fa-newspaper fa-4x text-muted mb-4"></i>
+                                    {% if query %}
+                                    <h4 class="text-muted mb-2">No articles found</h4>
+                                    <p class="text-muted mb-4">We couldn't find any articles matching "<strong>{{ query }}</strong>". Try adjusting your search terms.</p>
+                                    <a href="{% url 'view_news' %}" class="btn btn-primary">
+                                        <i class="fas fa-arrow-left mr-2"></i>View All Articles
+                                    </a>
+                                    {% else %}
+                                    <h4 class="text-muted mb-2">No news articles available</h4>
+                                    <p class="text-muted mb-4">Check back later for new content or be the first to publish an article!</p>
+                                    {% if request.session.rid %}
+                                    <a href="{% url 'add_news_article' %}" class="btn btn-primary">
+                                        <i class="fas fa-plus mr-2"></i>Add First Article
+                                    </a>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: calc(100vh - 80px);
+}
+
+.sidebar-sticky {
+    position: sticky;
+    top: 100px;
+}
+
+.article-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.article-card .card-header {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+}
+
+.category-filter .btn.active {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.badge-pill {
+    font-size: 0.75em;
+    padding: 0.375em 0.75em;
+}
+
+.article-content p {
+    margin-bottom: 0;
+}
+
+.summary-section .alert {
+    border-radius: 8px;
+    border-left: 4px solid #17a2b8;
+}
+
+.card-actions {
+    border-top: 1px solid #f1f3f4;
+    padding-top: 12px;
+}
+
+.article-stats {
+    font-weight: 500;
+}
+
+.empty-state {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar-sticky {
+        position: static;
+    }
+    
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .d-flex.align-items-center {
+        margin-top: 10px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Summary toggle functionality
+    const toggleButtons = document.querySelectorAll('.toggle-summary');
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const articleId = this.getAttribute('data-article-id');
+            const summaryDiv = document.getElementById('summary-' + articleId);
+            
+            if (summaryDiv.style.display === 'none') {
+                summaryDiv.style.display = 'block';
+                this.innerHTML = '<i class="fas fa-eye-slash mr-1"></i>Hide AI Summary';
+                this.classList.remove('btn-outline-info');
+                this.classList.add('btn-info');
+            } else {
+                summaryDiv.style.display = 'none';
+                this.innerHTML = '<i class="fas fa-eye mr-1"></i>View AI Summary';
+                this.classList.remove('btn-info');
+                this.classList.add('btn-outline-info');
+            }
+        });
+    });
+
+    // Read more functionality
+    const readMoreButtons = document.querySelectorAll('.read-more-btn');
+    readMoreButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const articleId = this.getAttribute('data-article-id');
+            const articleCard = this.closest('.article-card');
+            const content = articleCard.querySelector('.article-content p');
+            
+            if (this.textContent.includes('Read More')) {
+                content.style.maxHeight = 'none';
+                this.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>Read Less';
+            } else {
+                content.style.maxHeight = '100px';
+                content.style.overflow = 'hidden';
+                this.innerHTML = '<i class="fas fa-chevron-down mr-1"></i>Read More';
+            }
+        });
+    });
+
+    // Like functionality (placeholder)
+    window.likeArticle = function(articleId) {
+        // Placeholder for like functionality
+        const btn = event.target.closest('button');
+        btn.classList.toggle('btn-outline-primary');
+        btn.classList.toggle('btn-primary');
+        const icon = btn.querySelector('i');
+        icon.classList.toggle('fas');
+        icon.classList.toggle('far');
+    };
+
+    // Share functionality
+    window.shareArticle = function(title, url) {
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                url: url
+            });
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(url).then(function() {
+                alert('Link copied to clipboard!');
+            });
+        }
+    };
+
+    // Bookmark functionality (placeholder)
+    window.bookmarkArticle = function(articleId) {
+        alert('Article bookmarked! (This is a placeholder function)');
+    };
+
+    // Smooth scrolling for sidebar links
+    const sidebarLinks = document.querySelectorAll('.sidebar-sticky a[href^="#"]');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Add loading animation for search
+    const searchForm = document.querySelector('form[method="GET"]');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Searching...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}
