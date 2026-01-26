@@ -187,9 +187,11 @@
                                 </div>
 
                                 <div class="article-content mb-3">
-                                    <p class="card-text text-dark" style="line-height: 1.6; font-size: 14px;">
-                                        {{ article.content|truncatechars:250 }}
-                                    </p>
+                                    <div class="content-wrapper" style="max-height: 100px; overflow: hidden; transition: max-height 0.3s ease;">
+                                        <p class="card-text text-dark" style="line-height: 1.6; font-size: 14px;">
+                                            {{ article.content }}
+                                        </p>
+                                    </div>
                                     {% if article.content|length > 250 %}
                                     <button class="btn btn-link p-0 text-primary btn-sm read-more-btn" data-article-id="{{ article.id }}">
                                         <i class="fas fa-chevron-down mr-1"></i>Read More
@@ -391,14 +393,14 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const articleId = this.getAttribute('data-article-id');
             const articleCard = this.closest('.article-card');
-            const content = articleCard.querySelector('.article-content p');
+            const wrapper = articleCard.querySelector('.content-wrapper');
             
             if (this.textContent.includes('Read More')) {
-                content.style.maxHeight = 'none';
+                wrapper.style.maxHeight = 'none';
                 this.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>Read Less';
             } else {
-                content.style.maxHeight = '100px';
-                content.style.overflow = 'hidden';
+                wrapper.style.maxHeight = '100px';
+                wrapper.style.overflow = 'hidden';
                 this.innerHTML = '<i class="fas fa-chevron-down mr-1"></i>Read More';
             }
         });

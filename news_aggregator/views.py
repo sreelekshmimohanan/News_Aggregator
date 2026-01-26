@@ -47,6 +47,7 @@ def addlogin(request):
         return render(request,'index.html')
 
     elif regtable.objects.filter(email=email,password=password).exists():
+            print("user login")
             userdetails=regtable.objects.get(email=request.POST['email'], password=password)
             request.session['uid'] = userdetails.id
             return render(request,'index.html')
